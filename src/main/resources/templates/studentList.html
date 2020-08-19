@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('#deleteModal').on('show.bs.modal', function(e) {
+                const name = $(e.relatedTarget).data('name');
+                const id = $(e.relatedTarget).data('id');
+                $(e.currentTarget).find('a[name="studentName"]').text(name);
+                $('#deleteForm').attr('action', 'http://localhost:4200/delete?id='+id);
+            });
+            $('#updateModal').on('show.bs.modal', function(e) {
+                let id = $(e.relatedTarget).data('id');
+                let name = $(e.relatedTarget).data('name');
+                let age = $(e.relatedTarget).data('age');
+                let gender = $(e.relatedTarget).data('gender');
+                let course = $(e.relatedTarget).data('course');
+                $('#name-update').val(name);
+                $('#age-update').val(age);
+                $('#gender-update').val(gender);
+                $('#course-update').val(course);
+
+                $('#updateButton').click(function(){
+                    name = $("#name-update").val();
+                    age = $("#age-update").val();
+                    gender = $("#gender-update").val();
+                    course = $("#course-update").val();
+                    location.replace(`/update?id=${id}&name=${name}&age=${age}&gender=${gender}&course=${course}`);
+                });
+            });
+            $('#newModal').on('show.bs.modal', function(e) {
+                $('#newButton').click(function(){
+                    name = $("#name-new").val();
+                    age = $("#age-new").val();
+                    gender = $("#gender-new").val();
+                    course = $("#course-new").val();
+                    location.replace(`/add?name=${name}&age=${age}&gender=${gender}&course=${course}`);
+                });
+            });
+        });
+
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<!-- Image and text -->
+
+<nav class="navbar navbar-light bg-light mb-5">
+    <a class="navbar-brand d-flex" href="#">
+        <img src="https://picsum.photos/200" width="30" height="30" class="d-inline-block align-top" alt="">
+        <div class="font-weight-bold ml-2" >Student Management System</div>
+    </a>
+</nav>
+<div class="d-flex justify-content-center w-100 m-2">
+    <button data-toggle="modal" data-target="#newModal" id="preNew" class="btn btn-success">Add New</button>
+</div>
+<div class="d-flex justify-content-center w-100" >
+    <table class="table table-bordered w-75">
+        <thead>
+        <tr>
+            <th class="text-center" scope="col">Id</th>
+            <th class="text-center" scope="col">Name</th>
+            <th class="text-center" scope="col">Age</th>
+            <th class="text-center" scope="col">Gender</th>
+            <th class="text-center" scope="col">Course</th>
+            <th class="text-center" scope="col">Operations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student : ${students}" >
+            <td class="text-center" th:text="${student.id}" ></td>
+            <td class="text-center" th:text="${student.name}" ></td>
+            <td class="text-center" th:text="${student.age}" ></td>
+            <td class="text-center" th:text="${student.gender}" ></td>
+            <td class="text-center" th:text="${student.course}" ></td>
+            <td class="d-flex justify-content-around align-items-center">
+                <button data-toggle="modal" data-target="#deleteModal" th:data-name="${student.name}" th:data-id="${student.id}" id="someButton" class="btn btn-danger">Delete</button>
+                <button data-toggle="modal" data-target="#updateModal"
+                        th:data-id="${student.id}"
+                        th:data-name="${student.name}"
+                        th:data-age="${student.age}"
+                        th:data-gender="${student.gender}"
+                        th:data-course="${student.course}"
+                        class="btn btn-warning" >
+                    Update
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Warning !!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure to delete <a class="font-weight-bold" name="studentName"></a> from database ?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm">
+                    <div class="form-group">
+                        <label for="name-update">Name</label>
+                        <input type="text" class="form-control" id="name-update">
+                    </div>
+                    <div class="form-group">
+                        <label for="age-update">Age</label>
+                        <input type="number" class="form-control" id="age-update">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender-update">Gender</label>
+                        <select class="form-control" id="gender-update">
+                            <option value="Male" >Male</option>
+                            <option value="Female" >Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course-update">Course</label>
+                        <select class="form-control" id="course-update">
+                            <option value="Arts" >Arts</option>
+                            <option value="Maths" >Maths</option>
+                            <option value="English" >English</option>
+                            <option value="Java" >Java</option>
+                            <option value="Management" >Management</option>
+                            <option value="Dancing" >Dancing</option>
+                        </select>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button id="updateButton" class="btn btn-warning">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Modal -->
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Student</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newForm">
+                    <div class="form-group">
+                        <label for="name-update">Name</label>
+                        <input type="text" class="form-control" id="name-new">
+                    </div>
+                    <div class="form-group">
+                        <label for="age-update">Age</label>
+                        <input type="number" class="form-control" id="age-new">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender-update">Gender</label>
+                        <select class="form-control" id="gender-new">
+                            <option value="Male" >Male</option>
+                            <option value="Female" >Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course-update">Course</label>
+                        <select class="form-control" id="course-new">
+                            <option value="Arts" >Arts</option>
+                            <option value="Maths" >Maths</option>
+                            <option value="English" >English</option>
+                            <option value="Java" >Java</option>
+                            <option value="Management" >Management</option>
+                            <option value="Dancing" >Dancing</option>
+                        </select>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button id="newButton" class="btn btn-success">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
